@@ -3,17 +3,24 @@ package com.example.Online.Course.Management.System.entity;
 import com.example.Online.Course.Management.System.enums.Roles;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 
 import java.util.Date;
 import java.util.List;
 
 @Entity
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "user")
+@Table(name = "User")
+@EntityListeners(AuditingEntityListener.class)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,25 +34,21 @@ public class User {
     private Roles role;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "profile_id")
+    @JoinColumn(name = "profile_id", referencedColumnName = "profileId")
     private UserProfile userProfile;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "user_course",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "course_id")
-    )
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Course> courseList;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Review> reviews;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Enrollment> enrollments;
 
+    @CreatedDate
     private Date createdDate;
+    @LastModifiedDate
     private Date updatedDate;
+
 }

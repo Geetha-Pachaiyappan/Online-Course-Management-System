@@ -1,12 +1,12 @@
 package com.example.Online.Course.Management.System.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Date;
 
@@ -14,6 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@EntityListeners(AuditingEntityListener.class)
 public class Lessons {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +23,8 @@ public class Lessons {
     private String videoUrl;
     private int durationInMinutes;
 
+    @CreatedDate
     private Date createdDate;
+    @LastModifiedDate
     private Date updatedDate;
 }
