@@ -6,12 +6,14 @@ import com.example.Online.Course.Management.System.dto.UserRequestDto;
 import com.example.Online.Course.Management.System.dto.UserResponseDto;
 import com.example.Online.Course.Management.System.entity.User;
 import com.example.Online.Course.Management.System.entity.UserProfile;
+import com.example.Online.Course.Management.System.exception.ResourceNotFoundException;
 import com.example.Online.Course.Management.System.repository.UserProfileRepository;
 import com.example.Online.Course.Management.System.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -53,13 +55,13 @@ public class UserProfileService {
 
     public byte[] getProfilePicture(int profileId){
         UserProfile userProfile = profileRepo.findById(profileId)
-                .orElseThrow(()->new RuntimeException("Profile Id Not Found!"));
+                .orElseThrow(()->new ResourceNotFoundException("Profile id not found "+ profileId));
         return userProfile.getProfilePicture();
     }
 
     public UserProfileResponseDto getProfileInfo(int profileId){
         UserProfile userProfile = profileRepo.findById(profileId)
-                .orElseThrow(()->new RuntimeException("Profile Id Not Found!"));
+                .orElseThrow(()->new ResourceNotFoundException("Profile id not found "+ profileId));
         return modelMapper.map(userProfile, UserProfileResponseDto.class);
     }
 

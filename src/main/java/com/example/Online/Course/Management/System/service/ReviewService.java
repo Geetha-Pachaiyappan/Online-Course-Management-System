@@ -3,6 +3,7 @@ package com.example.Online.Course.Management.System.service;
 import com.example.Online.Course.Management.System.dto.ReviewDto;
 import com.example.Online.Course.Management.System.entity.Course;
 import com.example.Online.Course.Management.System.entity.Review;
+import com.example.Online.Course.Management.System.exception.ResourceNotFoundException;
 import com.example.Online.Course.Management.System.repository.CourseRepository;
 import com.example.Online.Course.Management.System.repository.ReviewRepository;
 import com.example.Online.Course.Management.System.repository.UserRepository;
@@ -33,9 +34,9 @@ public class ReviewService {
                 .map(reviewDto1 -> {
                     Review review = modelMapper.map(reviewDto1, Review.class);
                     review.setUser(userRepo.findById(reviewDto1.getUserId())
-                            .orElseThrow(()-> new RuntimeException("User id Not Found")));
+                            .orElseThrow(()-> new ResourceNotFoundException("User id Not Found "+ reviewDto1.getUserId())));
                     review.setCourse(courseRepo.findById(reviewDto1.getCourseId())
-                            .orElseThrow(()-> new RuntimeException("Course id Not Found")));
+                            .orElseThrow(()-> new ResourceNotFoundException("Course id Not Found "+ reviewDto1.getCourseId())));
                     return review;
                 }).toList();
 
@@ -63,7 +64,7 @@ public class ReviewService {
     public ResponseEntity<?> averageRating(int courseId){
         Double avgRating = reviewRepo.averageRatingOfCourse(courseId);
         Course course = courseRepo.findById(courseId)
-                .orElseThrow(() ->new RuntimeException("Course id not found"));
+                .orElseThrow(() ->new ResourceNotFoundException("Course id not found "+ courseId));
         Map<String, Object> output = new HashMap<>();
         output.put("CourseId", courseId);
         output.put("CourseName", course.getTitle());

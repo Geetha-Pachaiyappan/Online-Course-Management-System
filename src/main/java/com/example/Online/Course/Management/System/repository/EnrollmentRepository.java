@@ -20,4 +20,11 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment,Integer> 
             "where c.courseId = ?1 ")
     int countOfEnrollmentsByCourse(int courseId);
 
+    @Query("select e from Enrollment e " +
+            "join e.course c " +
+            "join e.user u " +
+            "where c.courseId = ?2 " +
+            "AND u.userId = ?1 ")
+    Enrollment checkUserIdAndCourseId(int userId, int courseId);
+
 }

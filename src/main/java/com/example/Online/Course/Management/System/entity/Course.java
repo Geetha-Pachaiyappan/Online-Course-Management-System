@@ -23,6 +23,7 @@ public class Course {
     private String title;
     private String description;
     private double price;
+    private int availableSeats;
     @CreatedDate
     private Date createdDate;
     @LastModifiedDate

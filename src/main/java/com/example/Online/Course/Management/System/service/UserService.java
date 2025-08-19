@@ -1,9 +1,9 @@
 package com.example.Online.Course.Management.System.service;
 
-import java.util.Date;
 import java.util.List;
 
-import com.example.Online.Course.Management.System.enums.Roles;
+import com.example.Online.Course.Management.System.exception.DuplicateResourceException;
+import com.example.Online.Course.Management.System.exception.ResourceNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,11 @@ public class UserService {
     public List<UserResponseDto> addAllUsers(List<UserRequestDto> userRequestDtoList){
         // UserRequestDto -> Users
        List<User> users =  userRequestDtoList.stream()
-                .map(dto -> modelMapper.map(dto,User.class))
+                .map(dto ->{
+                    User user = modelMapper.map(dto,User.class);
+                    checkEmail(dto.getEmail());
+                    return user;
+                })
                 .toList();
        // Save Users to DB
        List<User> savedUsers = userRepo.saveAll(users);
@@ -36,6 +40,13 @@ public class UserService {
         return savedUsers.stream()
                 .map(user -> modelMapper.map(user, UserResponseDto.class))
                 .toList();
+    }
+
+    //check email if already exist
+    public void checkEmail(String email){
+        User user = userRepo.findByEmail(email);
+        if(user != null)
+            throw new DuplicateResourceException("This Email is already exist " + email);
     }
 
     //Select List Of Users
@@ -51,6 +62,8 @@ public class UserService {
     //findByEmail
     public UserResponseDto getUserByEmail(String email){
         User user = userRepo.findByEmail(email);
+        if(user == null)
+            throw new ResourceNotFoundException("Invalid Email id");
         return modelMapper.map(user,UserResponseDto.class);
     }
 

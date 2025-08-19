@@ -18,6 +18,7 @@ public class CourseResponseDto {
     private String title;
     private String description;
     private double price;
+    private int availableSeats;
     private Date createdDate;
     private Date updatedDate;
 //    private List<CategoryDto> categoryList;

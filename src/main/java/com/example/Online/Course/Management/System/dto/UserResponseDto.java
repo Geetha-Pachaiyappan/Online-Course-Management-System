@@ -17,6 +17,7 @@ public class UserResponseDto {
     private String name;
     private String email;
     private Roles role;
+    private double wallet;
     private Date createdDate;
     private Date updatedDate;
     private UserProfileResponseDto userProfile;

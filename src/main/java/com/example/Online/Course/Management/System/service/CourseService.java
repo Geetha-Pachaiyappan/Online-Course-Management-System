@@ -3,6 +3,7 @@ package com.example.Online.Course.Management.System.service;
 import com.example.Online.Course.Management.System.dto.CourseRequestDto;
 import com.example.Online.Course.Management.System.dto.CourseResponseDto;
 import com.example.Online.Course.Management.System.entity.Course;
+import com.example.Online.Course.Management.System.exception.ResourceNotFoundException;
 import com.example.Online.Course.Management.System.repository.CategoryRepository;
 import com.example.Online.Course.Management.System.repository.CourseRepository;
 import com.example.Online.Course.Management.System.repository.UserRepository;
@@ -33,7 +34,7 @@ public class CourseService {
         List<Course> courseList = dtos.stream()
                 .map(courseDto -> {
                     Course course1 = modelMapper.map(courseDto, Course.class);
-                    course1.setUser(userRepo.findById(courseDto.getUser()).orElseThrow(()-> new RuntimeException("User id not found")));
+                    course1.setUser(userRepo.findById(courseDto.getUser()).orElseThrow(()-> new ResourceNotFoundException("User id not found "+ courseDto.getUser())));
                     course1.setCategoryList(categoryRepo.findAllById(courseDto.getCategoryIdsList()));
                     return course1;
                 }).toList();
@@ -60,7 +61,7 @@ public class CourseService {
     public List<CourseResponseDto> findCoursesByInstructorId(int instructorId){
         List<Course> courses = courseRepo.findByUserUserId(instructorId);
         if(courses.isEmpty()){
-            throw new RuntimeException("Instructor id not valid");
+            throw new ResourceNotFoundException("Instructor id not valid "+ instructorId );
         }
         return courses.stream()
                 .map(course -> modelMapper.map(course, CourseResponseDto.class))

@@ -1,13 +1,21 @@
 package com.example.Online.Course.Management.System.service;
 
 
-import com.example.Online.Course.Management.System.dto.EnrollmentDto;
+import com.example.Online.Course.Management.System.dto.EnrollmentRequestDto;
+import com.example.Online.Course.Management.System.dto.EnrollmentResponseDto;
 import com.example.Online.Course.Management.System.entity.Course;
 import com.example.Online.Course.Management.System.entity.Enrollment;
+import com.example.Online.Course.Management.System.entity.User;
+import com.example.Online.Course.Management.System.enums.EnrollmentStatus;
+import com.example.Online.Course.Management.System.enums.Roles;
+import com.example.Online.Course.Management.System.exception.DuplicateResourceException;
+import com.example.Online.Course.Management.System.exception.InsufficientBalanceException;
+import com.example.Online.Course.Management.System.exception.ResourceNotFoundException;
+import com.example.Online.Course.Management.System.exception.SeatsNotAvailableException;
 import com.example.Online.Course.Management.System.repository.CourseRepository;
 import com.example.Online.Course.Management.System.repository.EnrollmentRepository;
 import com.example.Online.Course.Management.System.repository.UserRepository;
-import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,45 +38,71 @@ public class EnrollmentService {
     @Autowired
     private CourseRepository courseRepo;
 
-    public List<EnrollmentDto> saveAllEnrollments(List<EnrollmentDto> enrollmentDto){
-        List<Enrollment> enrollmentList = enrollmentDto.stream()
-                .map(enrollmentDto1 ->{
-                    Enrollment enrollment = modelMapper.map(enrollmentDto1, Enrollment.class);
-                    enrollment.setCourse(courseRepo.findById(enrollmentDto1.getCourseId())
-                            .orElseThrow(()-> new RuntimeException("Course Id Not Match")));
-                    enrollment.setUser(userRepo.findById(enrollmentDto1.getUserId())
-                            .orElseThrow(()-> new RuntimeException("User Id Not Match")));
-                    return enrollment;
-                } ).toList();
+    @Transactional
+    public EnrollmentResponseDto saveAllEnrollments(EnrollmentRequestDto enrollmentRequestDto){
+        // Course Entity
+        Course course = courseRepo.findById(enrollmentRequestDto.getCourseId())
+                .orElseThrow(()-> new ResourceNotFoundException("Course id not found "+ enrollmentRequestDto.getCourseId()));
+        // User Entity
+        User user = userRepo.findById(enrollmentRequestDto.getUserId())
+                .orElseThrow(()-> new ResourceNotFoundException("User id is not found "+ enrollmentRequestDto.getUserId()));
+        // call method
+        isUserAlreadyEnrolled(user,course);
+        if(checkAvailableSeats(course) && checkWallet(user,course)){
+            // decrease the available seats in course and save
+            course.setAvailableSeats(course.getAvailableSeats()-1);
+            courseRepo.save(course);
+            // decrease money in thw wallet and save user wallet;
+            user.setWallet(user.getWallet() - course.getPrice());
+        }
+        // Save Enrollment
+        Enrollment enrollment = new Enrollment();
+        enrollment.setCourse(course);
+        enrollment.setUser(user);
+        enrollment.setStatus(EnrollmentStatus.ACTIVE);
+        Enrollment savedEnrollment = enrollmentRepo.save(enrollment);
 
-        List<Enrollment> savedEnrollments = enrollmentRepo.saveAll(enrollmentList);
-
-        return savedEnrollments.stream()
-                .map(enrollment -> modelMapper.map(enrollment, EnrollmentDto.class))
-                .toList();
+        return modelMapper.map(savedEnrollment, EnrollmentResponseDto.class);
     }
 
-    public Page<EnrollmentDto> getAllEnrollments(int page, int size, String sortBy ){
+    public void isUserAlreadyEnrolled(User user, Course course){
+        if(enrollmentRepo.checkUserIdAndCourseId(user.getUserId(), course.getCourseId()) != null)
+            throw new DuplicateResourceException("This user already enrolled " + course.getTitle() + " Course");
+    }
+    //Check Available Seats
+    public boolean checkAvailableSeats(Course course){
+        if(course.getAvailableSeats() <= 0)
+            throw new SeatsNotAvailableException("Seats not available ");
+        return true;
+    }
+    //Check Wallet
+    public boolean checkWallet(User user, Course course){
+        if(user.getWallet() < course.getPrice())
+            throw new InsufficientBalanceException("Insufficient balance in your wallet");
+        return true;
+    }
+
+    public Page<EnrollmentResponseDto> getAllEnrollments(int page, int size, String sortBy ){
 //        List<Enrollment> enrollmentList = enrollmentRepo.findAll();
 //        return enrollmentList.stream()
 //                .map(enrollment -> modelMapper.map(enrollment, EnrollmentDto.class))
 //                .toList();
         Pageable pageable = PageRequest.of(page,size, Sort.by(sortBy).ascending());
         Page<Enrollment> enrollments = enrollmentRepo.findAll(pageable);
-        return enrollments.map(enrollment -> modelMapper.map(enrollment,EnrollmentDto.class));
+        return enrollments.map(enrollment -> modelMapper.map(enrollment, EnrollmentResponseDto.class));
     }
 
-    public List<EnrollmentDto> getAllEnrollmentsByUserId(int userId){
+    public List<EnrollmentResponseDto> getAllEnrollmentsByUserId(int userId){
         List<Enrollment> enrollments = enrollmentRepo.findByUserUserId(userId);
         return enrollments.stream()
-                .map(enrollment -> modelMapper.map(enrollment,EnrollmentDto.class))
+                .map(enrollment -> modelMapper.map(enrollment, EnrollmentResponseDto.class))
                 .toList();
     }
 
-    public List<EnrollmentDto> getAllEnrollmentsByCourseId(int courseId){
+    public List<EnrollmentResponseDto> getAllEnrollmentsByCourseId(int courseId){
         List<Enrollment> enrollments = enrollmentRepo.findByCourseCourseId(courseId);
         return enrollments.stream()
-                .map(enrollment -> modelMapper.map(enrollment,EnrollmentDto.class))
+                .map(enrollment -> modelMapper.map(enrollment, EnrollmentResponseDto.class))
                 .toList();
     }
 
@@ -76,10 +110,19 @@ public class EnrollmentService {
         Map<String, Object> output = new HashMap<>();
         Integer count =  enrollmentRepo.countOfEnrollmentsByCourse(courseId);
         Course course = courseRepo.findById(courseId)
-                .orElseThrow(()-> new RuntimeException("Course id not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("Course id not found "+ courseId));
         output.put("Count", count);
         output.put("CourseId", courseId);
         output.put("CourseName", course.getTitle());
         return ResponseEntity.ok().body(output);
+    }
+
+    public ResponseEntity<EnrollmentResponseDto>  updateEnrollmentStatus(int enrollmentId, String status){
+        Enrollment enrollment = enrollmentRepo.findById(enrollmentId).orElseThrow(
+                ()-> new ResourceNotFoundException("Enrollment id is not found "+ enrollmentId)
+        );
+        enrollment.setStatus(EnrollmentStatus.valueOf(status.toUpperCase()));
+        enrollmentRepo.save(enrollment);
+        return ResponseEntity.ok().body(modelMapper.map(enrollment,EnrollmentResponseDto.class));
     }
 }

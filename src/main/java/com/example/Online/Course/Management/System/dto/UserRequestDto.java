@@ -6,6 +6,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,5 +26,8 @@ public class UserRequestDto {
     @Size(min = 6, message = "Password Should be Minimum 6 Characters")
     private String password;
     private Roles role;
+    @PositiveOrZero
+    @NotNull
+    private double wallet;
 
 }
