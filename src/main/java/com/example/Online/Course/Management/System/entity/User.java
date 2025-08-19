@@ -30,9 +30,7 @@ public class User {
     private String email;
     private String password;
     private double wallet;
-
-    @Enumerated(EnumType.STRING)
-    private Roles role;
+    private String role;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_id", referencedColumnName = "profileId")

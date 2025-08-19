@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class UserResponseDto {
     private String name;
     private String email;
-    private Roles role;
+    private String role;
     private double wallet;
     private Date createdDate;
     private Date updatedDate;

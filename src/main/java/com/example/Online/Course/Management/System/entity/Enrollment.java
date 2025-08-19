@@ -25,8 +25,7 @@ public class Enrollment {
     @LastModifiedDate
     private Date updatedDate;
 
-    @Enumerated(EnumType.STRING)
-    private EnrollmentStatus status;
+    private String status;
 
     @ManyToOne
     @JoinColumn(name = "course_id")

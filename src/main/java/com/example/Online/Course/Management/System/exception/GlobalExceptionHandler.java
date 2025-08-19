@@ -1,11 +1,18 @@
 package com.example.Online.Course.Management.System.exception;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.ObjectError;
+import org.springframework.validation.method.MethodValidationException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
+import java.lang.reflect.Array;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -64,5 +71,60 @@ public class GlobalExceptionHandler {
                 request.getDescription(false)
         );
         return error;
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ApiValidationErrorResponse methodArgumentNotValidException(
+            MethodArgumentNotValidException exception,
+            WebRequest request
+    ){
+        List<String> errors = exception.getBindingResult().getFieldErrors()
+                .stream()
+                .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+                .toList();
+        ApiValidationErrorResponse error = new ApiValidationErrorResponse(
+                LocalDateTime.now(),
+                errors,
+                HttpStatus.BAD_REQUEST.value(),
+                request.getDescription(false)
+        );
+        return error;
+    }
+
+    @ExceptionHandler(MethodValidationException.class)
+    public ApiValidationErrorResponse methodValidationException(
+            MethodValidationException exception,
+            WebRequest request
+    ){
+        List<String> errors = exception.getAllErrors().stream()
+                .map(error -> error.getDefaultMessage())
+                .toList();
+        return new ApiValidationErrorResponse(
+                LocalDateTime.now(),
+                errors,
+                HttpStatus.BAD_REQUEST.value(),
+                request.getDescription(false)
+        );
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ApiValidationErrorResponse handleHandlerMethodValidationException(
+            HandlerMethodValidationException exception,
+            WebRequest request) {
+
+        // Extract error messages
+        List<String> errors = exception.getAllErrors()
+                .stream()
+                .map(error -> error.getDefaultMessage())
+                .toList();
+
+        ApiValidationErrorResponse errorResponse = new ApiValidationErrorResponse(
+                LocalDateTime.now(),
+                errors,
+                HttpStatus.BAD_REQUEST.value(),
+                request.getDescription(false)
+        );
+
+        return errorResponse;
     }
 }

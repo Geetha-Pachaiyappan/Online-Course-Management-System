@@ -4,6 +4,7 @@ import com.example.Online.Course.Management.System.dto.CourseRequestDto;
 import com.example.Online.Course.Management.System.dto.CourseResponseDto;
 import com.example.Online.Course.Management.System.entity.Course;
 import com.example.Online.Course.Management.System.service.CourseService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,7 @@ public class CourseController {
     private CourseService courseService;
 
     @PostMapping
-    public ResponseEntity<List<CourseResponseDto>> saveCourses(@RequestBody List<CourseRequestDto> courseRequestDtos){
+    public ResponseEntity<List<CourseResponseDto>> saveCourses(@Valid @RequestBody List<CourseRequestDto> courseRequestDtos){
         return new ResponseEntity<>(courseService.addCourses(courseRequestDtos), HttpStatus.CREATED);
     }
 

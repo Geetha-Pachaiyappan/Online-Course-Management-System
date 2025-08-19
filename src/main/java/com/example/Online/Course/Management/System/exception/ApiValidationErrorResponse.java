@@ -10,9 +10,9 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ApiErrorResponse {
+public class ApiValidationErrorResponse {
     private LocalDateTime timeStamp;
-    private String message;
+    private List<String> errors;
     private int statusCode;
     private String path;
 }

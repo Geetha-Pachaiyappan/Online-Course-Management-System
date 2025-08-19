@@ -5,6 +5,7 @@ import com.example.Online.Course.Management.System.dto.EnrollmentRequestDto;
 import com.example.Online.Course.Management.System.dto.EnrollmentResponseDto;
 import com.example.Online.Course.Management.System.enums.EnrollmentStatus;
 import com.example.Online.Course.Management.System.service.EnrollmentService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ public class EnrollmentController {
     private EnrollmentService enrollmentService;
 
     @PostMapping
-    public ResponseEntity<EnrollmentResponseDto> saveAllEnrollments(@RequestBody EnrollmentRequestDto enrollmentRequestDtoList){
+    public ResponseEntity<EnrollmentResponseDto> saveAllEnrollments(@Valid @RequestBody EnrollmentRequestDto enrollmentRequestDtoList){
         return new ResponseEntity<>(enrollmentService.saveAllEnrollments(enrollmentRequestDtoList), HttpStatus.CREATED);
     }
 

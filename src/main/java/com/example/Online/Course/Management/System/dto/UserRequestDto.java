@@ -1,13 +1,11 @@
 package com.example.Online.Course.Management.System.dto;
 
 import com.example.Online.Course.Management.System.enums.Roles;
+import com.example.Online.Course.Management.System.validations.ValidRole;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,9 +21,12 @@ public class UserRequestDto {
     @Email(message = "Email Should be Valid")
     private String email;
     @NotNull
-    @Size(min = 6, message = "Password Should be Minimum 6 Characters")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$",
+            message = "Password must be at least 8 characters long," +
+                    " contain one digit, one lowercase, one uppercase, one special character, and no spaces")
     private String password;
-    private Roles role;
+    @ValidRole(message = "Invalid Role!!!")
+    private String role;
     @PositiveOrZero
     @NotNull
     private double wallet;

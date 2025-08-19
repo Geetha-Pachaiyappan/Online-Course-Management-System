@@ -59,7 +59,7 @@ public class EnrollmentService {
         Enrollment enrollment = new Enrollment();
         enrollment.setCourse(course);
         enrollment.setUser(user);
-        enrollment.setStatus(EnrollmentStatus.ACTIVE);
+        enrollment.setStatus(String.valueOf(EnrollmentStatus.ACTIVE));
         Enrollment savedEnrollment = enrollmentRepo.save(enrollment);
 
         return modelMapper.map(savedEnrollment, EnrollmentResponseDto.class);
@@ -89,7 +89,13 @@ public class EnrollmentService {
 //                .toList();
         Pageable pageable = PageRequest.of(page,size, Sort.by(sortBy).ascending());
         Page<Enrollment> enrollments = enrollmentRepo.findAll(pageable);
-        return enrollments.map(enrollment -> modelMapper.map(enrollment, EnrollmentResponseDto.class));
+        return enrollments.map(enrollment -> {
+            EnrollmentResponseDto enrollmentResponseDto ;
+            enrollmentResponseDto = modelMapper.map(enrollment,EnrollmentResponseDto.class);
+            enrollmentResponseDto.setCourseTitle(enrollment.getCourse().getTitle());
+            enrollmentResponseDto.setUserName(enrollment.getUser().getName());
+            return enrollmentResponseDto;
+        });
     }
 
     public List<EnrollmentResponseDto> getAllEnrollmentsByUserId(int userId){
@@ -121,7 +127,7 @@ public class EnrollmentService {
         Enrollment enrollment = enrollmentRepo.findById(enrollmentId).orElseThrow(
                 ()-> new ResourceNotFoundException("Enrollment id is not found "+ enrollmentId)
         );
-        enrollment.setStatus(EnrollmentStatus.valueOf(status.toUpperCase()));
+        enrollment.setStatus(String.valueOf(EnrollmentStatus.valueOf(status.toUpperCase())));
         enrollmentRepo.save(enrollment);
         return ResponseEntity.ok().body(modelMapper.map(enrollment,EnrollmentResponseDto.class));
     }
