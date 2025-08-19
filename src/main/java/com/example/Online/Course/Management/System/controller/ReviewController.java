@@ -24,4 +24,14 @@ public class ReviewController {
     public ResponseEntity<List<ReviewDto>> getAllReviews(){
         return new ResponseEntity<>(reviewService.getAllReviews(), HttpStatus.OK);
     }
+
+    @GetMapping("/course-review/{courseId}")
+    public ResponseEntity<List<ReviewDto>> getAllReviewsByCourseId(@PathVariable int courseId){
+        return ResponseEntity.ok().body(reviewService.getAllReviewsByCourseId(courseId));
+    }
+
+    @GetMapping("/average-rating/{courseId}")
+    public ResponseEntity<?> averageOfRating(@PathVariable int courseId){
+        return ResponseEntity.ok().body(reviewService.averageRating(courseId));
+    }
 }

@@ -21,6 +21,6 @@ public class CourseResponseDto {
     private Date createdDate;
     private Date updatedDate;
 //    private List<CategoryDto> categoryList;
-//    private UserResponseDto user;
+    private UserResponseDto user;
     private List<Modules> modules;
 }

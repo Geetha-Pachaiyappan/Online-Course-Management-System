@@ -30,4 +30,19 @@ public class CourseController {
         return new ResponseEntity<>(courseService.getAllCourses(page,size,courseId),HttpStatus.OK);
     }
 
+    @GetMapping("/course-list/{userId}")
+    public ResponseEntity<List<CourseResponseDto>> getByInstructorId(@PathVariable int userId){
+        return ResponseEntity.ok().body(courseService.findCoursesByInstructorId(userId));
+    }
+
+    @GetMapping("/search/{text}")
+    public ResponseEntity<List<CourseResponseDto>> findByKeywords(@PathVariable String text){
+        return ResponseEntity.ok().body(courseService.findByKeyword(text));
+    }
+
+    @GetMapping("/top-courses")
+    public ResponseEntity<List<CourseResponseDto>> findTopFiveCourses(){
+        return ResponseEntity.ok().body(courseService.findByRecentlyCreatedCourses());
+    }
+
 }

@@ -2,6 +2,8 @@ package com.example.Online.Course.Management.System.controller;
 
 
 import com.example.Online.Course.Management.System.dto.EnrollmentDto;
+import com.example.Online.Course.Management.System.entity.Course;
+import com.example.Online.Course.Management.System.entity.Enrollment;
 import com.example.Online.Course.Management.System.service.EnrollmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,7 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/enrollments")
@@ -29,5 +33,20 @@ public class EnrollmentController {
             @RequestParam(defaultValue = "enrollmentId") String enrollmentId
     ){
         return new ResponseEntity<>(enrollmentService.getAllEnrollments(page,size,enrollmentId), HttpStatus.OK);
+    }
+
+    @GetMapping("/user-enrollments/{userId}")
+    public ResponseEntity<List<EnrollmentDto>> getAllEnrollmentsByUserId(@PathVariable int userId){
+        return ResponseEntity.ok().body(enrollmentService.getAllEnrollmentsByUserId(userId));
+    }
+
+    @GetMapping("/course-enrollments/{courseId}")
+    public ResponseEntity<List<EnrollmentDto>> getAllEnrollmentsByCourseId(@PathVariable int courseId){
+       return ResponseEntity.ok().body(enrollmentService.getAllEnrollmentsByCourseId(courseId));
+    }
+
+    @GetMapping("/count/{courseId}")
+    public ResponseEntity<?> getCountOfEnrollments(@PathVariable int courseId){
+        return enrollmentService.getCountOfEnrollments(courseId);
     }
 }

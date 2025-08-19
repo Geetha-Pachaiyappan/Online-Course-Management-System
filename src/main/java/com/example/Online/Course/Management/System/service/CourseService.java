@@ -56,4 +56,28 @@ public class CourseService {
         Page<Course> courses = courseRepo.findAll(pageable);
         return courses.map(course -> modelMapper.map(course,CourseResponseDto.class));
     }
+
+    public List<CourseResponseDto> findCoursesByInstructorId(int instructorId){
+        List<Course> courses = courseRepo.findByUserUserId(instructorId);
+        if(courses.isEmpty()){
+            throw new RuntimeException("Instructor id not valid");
+        }
+        return courses.stream()
+                .map(course -> modelMapper.map(course, CourseResponseDto.class))
+                .toList();
+    }
+
+    public List<CourseResponseDto> findByKeyword(String text){
+        List<Course> courses = courseRepo.findByKeyword(text);
+        return courses.stream()
+                .map(course -> modelMapper.map(course,CourseResponseDto.class))
+                .toList();
+    }
+
+    public List<CourseResponseDto> findByRecentlyCreatedCourses(){
+        List<Course> courses = courseRepo.findRecentlyCreatedCourses();
+        return courses.stream()
+                .map(course -> modelMapper.map(course,CourseResponseDto.class))
+                .toList();
+    }
 }
