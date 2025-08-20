@@ -5,15 +5,18 @@ import com.example.Online.Course.Management.System.dto.EnrollmentRequestDto;
 import com.example.Online.Course.Management.System.dto.EnrollmentResponseDto;
 import com.example.Online.Course.Management.System.enums.EnrollmentStatus;
 import com.example.Online.Course.Management.System.service.EnrollmentService;
+import com.example.Online.Course.Management.System.validations.ValidEnrollmentStatus;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping("/enrollments")
 public class EnrollmentController {
@@ -52,7 +55,7 @@ public class EnrollmentController {
     @PutMapping("/status")
     public ResponseEntity<EnrollmentResponseDto> setEnrollmentStatus(
             @RequestParam int enrollmentId,
-            @RequestParam String status){
+            @ValidEnrollmentStatus @RequestParam String status){
         return enrollmentService.updateEnrollmentStatus(enrollmentId,status);
     }
 }

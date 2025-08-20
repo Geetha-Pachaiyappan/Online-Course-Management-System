@@ -127,4 +127,17 @@ public class GlobalExceptionHandler {
 
         return errorResponse;
     }
+
+    @ExceptionHandler(Exception.class)
+    public ApiErrorResponse handleExceptions(
+            Exception exception,
+            WebRequest request
+    ){
+        return new ApiErrorResponse(
+                LocalDateTime.now(),
+                exception.getMessage(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                request.getDescription(false)
+        );
+    }
 }
