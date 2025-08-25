@@ -1,5 +1,7 @@
 package com.example.Online.Course.Management.System.controller;
 
+import com.example.Online.Course.Management.System.dto.LoginRequest;
+import com.example.Online.Course.Management.System.dto.LoginResponse;
 import com.example.Online.Course.Management.System.dto.UserRequestDto;
 import com.example.Online.Course.Management.System.dto.UserResponseDto;
 import com.example.Online.Course.Management.System.entity.User;
@@ -28,8 +30,7 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-    @Autowired
-    private AuthenticationManager authenticationManager;
+
 
     @PostMapping
     public ResponseEntity<List<UserResponseDto>> addUsersList(@Valid @RequestBody List<UserRequestDto> users){
@@ -53,14 +54,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestParam("email") String email,
-                                       @RequestParam("password") String password){
-       Authentication authentication =  authenticationManager.authenticate(
-               new UsernamePasswordAuthenticationToken(email,password));
-       if(authentication.isAuthenticated()){
-           System.out.println("logged in");
-           return ResponseEntity.ok("Login Successful");
-       }
-       return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<LoginResponse> loginUser(@RequestBody LoginRequest loginRequest){
+       return userService.loginUser(loginRequest);
     }
 }

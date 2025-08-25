@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ApiErrorResponse {
-    private LocalDateTime timeStamp;
+    private String timeStamp;
     private String message;
     private int statusCode;
     private String path;

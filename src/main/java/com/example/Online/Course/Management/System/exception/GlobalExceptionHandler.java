@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
             WebRequest request
     ){
         ApiErrorResponse error = new ApiErrorResponse(
-                LocalDateTime.now(),
+                LocalDateTime.now().toString(),
                 ex.getMessage(),
                 HttpStatus.NOT_FOUND.value(),
                 request.getDescription(false)
@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
            WebRequest request
    ){
         ApiErrorResponse error = new ApiErrorResponse(
-                LocalDateTime.now(),
+                LocalDateTime.now().toString(),
                 ex.getMessage(),
                 HttpStatus.BAD_REQUEST.value(),
                 request.getDescription(false)
@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
             WebRequest request
     ){
         ApiErrorResponse error = new ApiErrorResponse(
-                LocalDateTime.now(),
+                LocalDateTime.now().toString(),
                 ex.getMessage(),
                 HttpStatus.BAD_REQUEST.value(),
                 request.getDescription(false)
@@ -65,7 +65,7 @@ public class GlobalExceptionHandler {
             WebRequest request
     ){
         ApiErrorResponse error = new ApiErrorResponse(
-                LocalDateTime.now(),
+                LocalDateTime.now().toString(),
                 ex.getMessage(),
                 HttpStatus.BAD_REQUEST.value(),
                 request.getDescription(false)
@@ -134,9 +134,34 @@ public class GlobalExceptionHandler {
             WebRequest request
     ){
         return new ApiErrorResponse(
-                LocalDateTime.now(),
+                LocalDateTime.now().toString(),
                 exception.getMessage(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                request.getDescription(false)
+        );
+    }
+    @ExceptionHandler(TokenNotValidException.class)
+    public ApiErrorResponse handleTokenNotValidException(
+            TokenNotValidException exception,
+            WebRequest request
+    ){
+        return new ApiErrorResponse(
+                LocalDateTime.now().toString(),
+                exception.getMessage(),
+                HttpStatus.UNAUTHORIZED.value(),
+                request.getDescription(false)
+        );
+    }
+
+    @ExceptionHandler(TokenNotFoundException.class)
+    public ApiErrorResponse handleTokenNotFoundException(
+            TokenNotFoundException exception,
+            WebRequest request
+    ){
+        return new ApiErrorResponse(
+                LocalDateTime.now().toString(),
+                exception.getMessage(),
+                HttpStatus.UNAUTHORIZED.value(),
                 request.getDescription(false)
         );
     }
