@@ -6,7 +6,7 @@ import jakarta.validation.Payload;
 import java.lang.annotation.*;
 
 @Documented
-@Target({ElementType.FIELD})
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 @Constraint(validatedBy = RoleValidator.class)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidRole {

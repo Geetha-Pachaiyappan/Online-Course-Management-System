@@ -6,6 +6,7 @@ import com.example.Online.Course.Management.System.exception.DuplicateResourceEx
 import com.example.Online.Course.Management.System.exception.ResourceNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,8 @@ public class UserService {
     private UserRepository userRepo;
     @Autowired
     private ModelMapper modelMapper;
+   @Autowired
+    private PasswordEncoder passwordEncoder;
 
     //Add List Of Users
     public List<UserResponseDto> addAllUsers(List<UserRequestDto> userRequestDtoList){
@@ -31,6 +34,7 @@ public class UserService {
                 .map(dto ->{
                     User user = modelMapper.map(dto,User.class);
                     checkEmail(dto.getEmail());
+                    user.setPassword(passwordEncoder.encode(dto.getPassword()));
                     return user;
                 })
                 .toList();

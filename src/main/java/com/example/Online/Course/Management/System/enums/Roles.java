@@ -1,5 +1,5 @@
 package com.example.Online.Course.Management.System.enums;
 
 public enum Roles {
-    STUDENT, INSTRUCTOR, ADMIN
+    ROLE_STUDENT, ROLE_INSTRUCTOR, ROLE_ADMIN
 }
